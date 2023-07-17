@@ -1,12 +1,42 @@
+import closeWithGrace from "close-with-grace";
 import buildServer from "./server";
 
 const server = buildServer();
 
+// Delay is the number of milliseconds for the graceful close to finish
+const closeListeners = closeWithGrace(
+  { delay: 500 },
+  async (opts: Record<string, unknown>) => {
+    if (opts.err) {
+      server.log.error(opts.err);
+    }
+
+    await server.close();
+  },
+);
+
+server.addHook("onClose", async (_instance, done) => {
+  closeListeners.uninstall();
+  done();
+});
+
 async function main() {
   try {
-    await server.listen(3000, "0.0.0.0");
+    void server.listen({
+      port: Number(process.env.PORT ?? 3000),
+      host: process.env.SERVER_HOSTNAME ?? "127.0.0.1",
+    });
 
-    console.log(`Server ready at http://localhost:3000`);
+    server.ready((err: Error) => {
+      if (err) {
+        server.log.error(err);
+        process.exit(1);
+      }
+
+      server.log.info(
+        `Server listening on port ${Number(process.env.PORT ?? 3000)}`,
+      );
+    });
   } catch (e) {
     console.error(e);
     process.exit(1);
