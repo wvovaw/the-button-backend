@@ -1,0 +1,51 @@
+{
+  "name": "the-button-api",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "wvovaw",
+  "license": "MIT",
+  "template": "TomDoesTech/fastify-prisma-rest-api, MIT",
+  "scripts": {
+    "dev": "tsnd --respawn --transpile-only --exit-child src/app.ts | pino-pretty -c",
+    "test": "tap --node-arg=--require=ts-node/register",
+    "db:gen": "yarn prisma generate",
+    "db:migrate": "yarn prisma migrate dev",
+    "db:push": "yarn prisma db push",
+    "db:studio": "yarn prisma studio",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "prepare": "husky install",
+    "prisma": "dotenv -e .env prisma",
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^8.0.2",
+    "@fastify/jwt": "^7.2.0",
+    "@fastify/swagger": "^8.8.0",
+    "fastify": "^4.20.0",
+    "fastify-zod": "^1.3.2",
+    "prisma": "^5.0.0",
+    "tap": "^16.3.7",
+    "ts-mock-imports": "^1.3.8",
+    "zod": "^3.21.4",
+    "zod-to-json-schema": "^3.21.4"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "4.1.1",
+    "@types/node": "^20.4.2",
+    "@types/tap": "^15.0.8",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "dotenv": "^16.3.1",
+    "dotenv-cli": "^7.2.1",
+    "eslint": "8.44.0",
+    "eslint-config-prettier": "^8.8.0",
+    "husky": "^8.0.3",
+    "pino-pretty": "^10.0.1",
+    "sinon": "^15.2.0",
+    "sort-package-json": "2.5.0",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.1.6"
+  }
+}
