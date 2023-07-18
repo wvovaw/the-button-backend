@@ -3,7 +3,6 @@ import buildServer from "./server";
 
 const server = buildServer();
 
-// Delay is the number of milliseconds for the graceful close to finish
 const closeListeners = closeWithGrace(
   { delay: 500 },
   async (opts: Record<string, unknown>) => {

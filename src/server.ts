@@ -1,11 +1,12 @@
 import Fastify, { FastifyRequest, FastifyReply } from "fastify";
 import fjwt, { JWT } from "@fastify/jwt";
 import swagger from "@fastify/swagger";
+import swaggerUi from "@fastify/swagger-ui";
 import { withRefResolver } from "fastify-zod";
 import userRoutes from "./modules/user/user.route";
-import productRoutes from "./modules/product/product.route";
+import recordRoutes from "./modules/record/record.route";
 import { userSchemas } from "./modules/user/user.schema";
-import { productSchemas } from "./modules/product/product.schema";
+import { recordSchemas } from "./modules/record/record.schema";
 import { version } from "../package.json";
 import * as dotenv from "dotenv";
 
@@ -20,16 +21,15 @@ declare module "fastify" {
     authenticate: any;
   }
 }
-
-// declare module "fastify-jwt" {
-//   interface FastifyJWT {
-//     user: {
-//       id: number;
-//       email: string;
-//       name: string;
-//     };
-//   }
-// }
+declare module "@fastify/jwt" {
+  interface FastifyJWT {
+    user: {
+      id: number;
+      email: string;
+      name: string;
+    };
+  }
+}
 
 function buildServer() {
   const isProduction = process.env.NODE_ENV === "production";
@@ -39,6 +39,9 @@ function buildServer() {
 
   server.register(fjwt, {
     secret: process.env.APP_JWT_SECRET ?? "changemetosecret",
+    verify: {
+      extractToken: (request) => request.headers.authorization,
+    },
   });
 
   server.decorate(
@@ -52,48 +55,65 @@ function buildServer() {
     },
   );
 
-  server.get("/healthcheck", async function () {
-    return { status: "OK" };
-  });
-
   server.addHook("preHandler", (req, reply, next) => {
     req.jwt = server.jwt;
     return next();
   });
 
-  for (const schema of [...userSchemas, ...productSchemas]) {
-    server.addSchema(schema);
-  }
-
+  // Register Swagger
   server.register(
     swagger,
-    withRefResolver(
-      {
-        openapi: {
-          info: {
-            title: "The Button clone API",
-            description: "API for The Button clone game",
-            version,
+    withRefResolver({
+      swagger: {
+        info: {
+          title: "The Button clone API ",
+          description: "The Button clone game API docs",
+          version,
+        },
+      },
+      openapi: {
+        components: {
+          securitySchemes: {
+            Authorization: {
+              type: "http",
+              scheme: "bearer",
+              bearerFormat: "JWT",
+            },
           },
         },
       },
-      //   {
-      //   routePrefix: "/docs",
-      //   exposeRoute: true,
-      //   staticCSP: true,
-      //   openapi: {
-      //     info: {
-      //       title: "The Button clone API",
-      //       description: "API for The Button clone game",
-      //       version,
-      //     },
-      //   },
-      // }
-    ),
+    }),
   );
+  server.register(swaggerUi, {
+    prefix: "/docs",
+    uiConfig: {
+      docExpansion: "full",
+      deepLinking: false,
+    },
+    uiHooks: {
+      onRequest: function (request, reply, next) {
+        next();
+      },
+      preHandler: function (request, reply, next) {
+        next();
+      },
+    },
+    staticCSP: true,
+    transformStaticCSP: (header) => header,
+    transformSpecification: (swaggerObject) => {
+      return swaggerObject;
+    },
+    transformSpecificationClone: true,
+  });
+
+  // Register routes with schemas
+  const allSchemas = [...userSchemas, ...recordSchemas];
+  for (const schema of allSchemas) {
+    server.addSchema(schema);
+  }
 
   server.register(userRoutes, { prefix: "api/users" });
-  server.register(productRoutes, { prefix: "api/products" });
+  server.register(recordRoutes, { prefix: "api/records" });
 
   return server;
 }
