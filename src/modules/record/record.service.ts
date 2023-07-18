@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+import { Prisma } from "@prisma/client";
 import prisma from "../../utils/prisma";
 import {
   CreateRecordInput,
@@ -10,36 +11,63 @@ import {
 export async function createRecord(
   data: CreateRecordInput & { ownerId: number },
 ) {
-  return prisma.record.create({
-    data: {
-      highScore: data.score,
-      totalAttempts: 1,
-      updatedTimes: 0,
-      ownerId: data.ownerId,
-    },
-  });
+  try {
+    return await prisma.record.create({
+      data: {
+        highScore: data.score,
+        totalAttempts: 1,
+        updatedTimes: 0,
+        ownerId: data.ownerId,
+      },
+      include: {
+        owner: true,
+      },
+    });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === "P2002")
+        throw new Error(
+          `The user with id ${data.ownerId} already has a Record associated with it`,
+          {
+            cause: "409",
+          },
+        );
+    } else throw e;
+  }
 }
 
 export async function updateRecord(
   data: UpdateRecordInput & { ownerId: number },
 ) {
-  return prisma.record.update({
-    where: {
-      ownerId: data.ownerId,
-    },
-    data: {
-      highScore: data.newScore,
-      totalAttempts: {
-        increment: data.attempts,
+  try {
+    return await prisma.record.update({
+      where: {
+        ownerId: data.ownerId,
       },
-      updatedTimes: {
-        increment: 1,
+      data: {
+        highScore: data.newScore,
+        totalAttempts: {
+          increment: data.attempts,
+        },
+        updatedTimes: {
+          increment: 1,
+        },
       },
-    },
-    include: {
-      owner: true,
-    },
-  });
+      include: {
+        owner: true,
+      },
+    });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === "P2002")
+        throw new Error(
+          `The user with id ${data.ownerId} doesn not have a Record associated with them`,
+          {
+            cause: "409",
+          },
+        );
+    } else throw e;
+  }
 }
 
 export async function getRecords(data: GetRecordsInput) {
@@ -80,12 +108,21 @@ export async function getRecords(data: GetRecordsInput) {
 }
 
 export async function getRecordByOwnerId(params: GetRecordByOwnderIdInput) {
-  return await prisma.record.findUnique({
-    where: {
-      ownerId: params.ownerId,
-    },
-    select: {
-      owner: true,
-    },
-  });
+  try {
+    return await prisma.record.findUniqueOrThrow({
+      where: {
+        ownerId: params.ownerId,
+      },
+      include: {
+        owner: true,
+      },
+    });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === "P2025")
+        throw new Error(`Record not found for ownerId ${params.ownerId}`, {
+          cause: "404",
+        });
+    } else throw e;
+  }
 }
