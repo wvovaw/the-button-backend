@@ -23,7 +23,7 @@ async function main() {
   try {
     void server.listen({
       port: Number(process.env.PORT ?? 3000),
-      host: process.env.SERVER_HOSTNAME ?? "127.0.0.1",
+      host: process.env.SERVER_HOSTNAME ?? "0.0.0.0",
     });
 
     server.ready((err: Error) => {

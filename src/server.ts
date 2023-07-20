@@ -32,10 +32,12 @@ declare module "@fastify/jwt" {
 }
 
 function buildServer() {
-  const isProduction = process.env.NODE_ENV === "production";
+  const nodeEnv = process.env.NODE_ENV ?? "development";
+  const isProduction = nodeEnv === "production";
   const server = Fastify({
     logger: !isProduction,
   });
+  server.log.info("Server build in %s mode", nodeEnv);
 
   server.register(fjwt, {
     secret: process.env.APP_JWT_SECRET ?? "changemetosecret",
