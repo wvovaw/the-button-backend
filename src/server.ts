@@ -1,4 +1,5 @@
 import Fastify, { FastifyRequest, FastifyReply } from "fastify";
+import cors from "@fastify/cors";
 import fjwt, { JWT } from "@fastify/jwt";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
@@ -38,6 +39,11 @@ function buildServer() {
     logger: !isProduction,
   });
   server.log.info("Server build in %s mode", nodeEnv);
+
+  server.register(cors, {
+    origin: [process.env.APP_FRONTEND_ORIGIN ?? "http://localhost:3000"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  });
 
   server.register(fjwt, {
     secret: process.env.APP_JWT_SECRET ?? "changemetosecret",
