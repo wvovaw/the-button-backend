@@ -20,8 +20,10 @@ model Record {
   id            Int      @id @default(autoincrement())
   owner         User     @relation(fields: [ownerId], references: [id])
   ownerId       Int      @unique
-  highScore     Int
-  totalAttempts Int
+  highscore     Int
+  totalResets   Int
+  totalClicks   Int
+  average       Float
   updatedTimes  Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

@@ -84,7 +84,7 @@ function buildServer() {
           securitySchemes: {
             Authorization: {
               type: "http",
-              scheme: "bearer",
+              scheme: "Bearer",
               bearerFormat: "JWT",
             },
           },

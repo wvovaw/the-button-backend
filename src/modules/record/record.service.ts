@@ -14,8 +14,10 @@ export async function createRecord(
   try {
     return await prisma.record.create({
       data: {
-        highScore: data.score,
-        totalAttempts: 1,
+        highscore: data.highscore,
+        totalClicks: data.totalClicks,
+        average: data.average,
+        totalResets: data.resets,
         updatedTimes: 0,
         ownerId: data.ownerId,
       },
@@ -40,15 +42,33 @@ export async function updateRecord(
   data: UpdateRecordInput & { ownerId: number },
 ) {
   try {
+    const currentAverage = await prisma.record.findUnique({
+      where: {
+        ownerId: data.ownerId,
+      },
+      select: {
+        average: true,
+        totalResets: true,
+      },
+    });
+
+    const { average, totalResets } = currentAverage ?? {
+      average: 0,
+      totalResets: 0,
+    };
+    const newAverage =
+      (average * totalResets + data.average * data.resets) / totalResets +
+      data.resets;
+
     return await prisma.record.update({
       where: {
         ownerId: data.ownerId,
       },
       data: {
-        highScore: data.newScore,
-        totalAttempts: {
-          increment: data.attempts,
-        },
+        highscore: data.highscore,
+        totalClicks: { increment: data.totalClicks },
+        totalResets: { increment: data.resets },
+        average: newAverage,
         updatedTimes: {
           increment: 1,
         },
@@ -81,8 +101,10 @@ export async function getRecords(data: GetRecordsInput) {
       skip: offset,
       select: {
         id: true,
-        highScore: true,
-        totalAttempts: true,
+        highscore: true,
+        totalClicks: true,
+        totalResets: true,
+        average: true,
         updatedTimes: true,
         owner: {
           select: {
@@ -93,6 +115,7 @@ export async function getRecords(data: GetRecordsInput) {
         createdAt: true,
         updatedAt: true,
       },
+      orderBy: [{ highscore: "desc" }, { totalResets: "asc" }],
     }),
     prisma.record.count(),
   ]);

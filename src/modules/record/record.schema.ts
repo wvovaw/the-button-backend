@@ -2,20 +2,27 @@ import { z } from "zod";
 import { buildJsonSchemas } from "fastify-zod";
 
 const createtRecordBodySchema = z.object({
-  score: z.number(),
+  highscore: z.number(),
+  resets: z.number(),
+  average: z.number(),
+  totalClicks: z.number(),
 });
 export type CreateRecordInput = z.infer<typeof createtRecordBodySchema>;
 
 const updateRecordBodySchema = z.object({
-  newScore: z.number(),
-  attempts: z.number(),
+  highscore: z.number(),
+  resets: z.number(),
+  average: z.number(),
+  totalClicks: z.number(),
 });
 export type UpdateRecordInput = z.infer<typeof updateRecordBodySchema>;
 
 const recordResponseSchema = z.object({
   id: z.number(),
-  highScore: z.number(),
-  totalAttempts: z.number(),
+  highscore: z.number(),
+  totalResets: z.number(),
+  totalClicks: z.number(),
+  average: z.number(),
   updatedTimes: z.number(),
   owner: z.object({
     id: z.number(),
