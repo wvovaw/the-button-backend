@@ -14,7 +14,7 @@ const closeListeners = closeWithGrace(
   },
 );
 
-server.addHook("onClose", async (_instance, done) => {
+server.addHook("onClose", (_instance, done) => {
   closeListeners.uninstall();
   done();
 });

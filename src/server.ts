@@ -48,7 +48,8 @@ function buildServer() {
   server.register(fjwt, {
     secret: process.env.APP_JWT_SECRET ?? "changemetosecret",
     verify: {
-      extractToken: (request) => request.headers.authorization,
+      extractToken: (request) =>
+        request.headers.authorization?.split(" ").at(1),
     },
   });
 
@@ -78,17 +79,18 @@ function buildServer() {
           description: "The Button clone game API docs",
           version,
         },
-      },
-      openapi: {
-        components: {
-          securitySchemes: {
-            Authorization: {
-              type: "http",
-              scheme: "Bearer",
-              bearerFormat: "JWT",
-            },
+        securityDefinitions: {
+          apiKey: {
+            type: "apiKey",
+            name: "Authorization",
+            in: "header",
           },
         },
+        security: [
+          {
+            apiKey: [],
+          },
+        ],
       },
     }),
   );
