@@ -80,6 +80,7 @@ export async function updateRecord(
       const w2 = data.peaks.length;
 
       record.average = (X1 + X2) / (w1 + w2);
+      record.averageWeight = w1 + w2;
 
       record.totalResets = { increment: data.peaks.length };
     }
