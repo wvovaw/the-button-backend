@@ -17,7 +17,7 @@ async function userRoutes(server: FastifyInstance) {
         },
       },
     },
-    registerUserHandler
+    registerUserHandler,
   );
 
   server.post(
@@ -30,15 +30,20 @@ async function userRoutes(server: FastifyInstance) {
         },
       },
     },
-    loginHandler
+    loginHandler,
   );
 
   server.get(
     "/",
     {
       preHandler: [server.authenticate],
+      schema: {
+        response: {
+          200: $ref("getUsersResponseSchema"),
+        },
+      },
     },
-    getUsersHandler
+    getUsersHandler,
   );
 }
 
