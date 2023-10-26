@@ -12,15 +12,26 @@ export async function createRecord(
   data: CreateRecordInput & { ownerId: number },
 ) {
   try {
+    type RecordCreateData = Parameters<typeof prisma.record.create>[0]["data"];
+    const record: RecordCreateData = {
+      ownerId: data.ownerId,
+      average: 0,
+      averageWeight: 0,
+      totalClicks: 0,
+      totalResets: 0,
+      highscore: 0,
+    };
+    if (data.highscore) record.highscore = data.highscore;
+    if (data.clicks) record.totalClicks = data.clicks;
+    if (data.peaks) {
+      const weight = data.peaks.length;
+      record.average = data.peaks.reduce((acc, cur) => acc + cur) / weight;
+      record.averageWeight = weight;
+      record.totalResets = weight;
+    }
+
     return await prisma.record.create({
-      data: {
-        highscore: data.highscore,
-        totalClicks: data.totalClicks,
-        average: data.average,
-        totalResets: data.resets,
-        updatedTimes: 0,
-        ownerId: data.ownerId,
-      },
+      data: record,
       include: {
         owner: true,
       },
@@ -31,7 +42,7 @@ export async function createRecord(
         throw new Error(
           `The user with id ${data.ownerId} already has a Record associated with it`,
           {
-            cause: "409",
+            cause: 409,
           },
         );
     } else throw e;
@@ -42,37 +53,42 @@ export async function updateRecord(
   data: UpdateRecordInput & { ownerId: number },
 ) {
   try {
-    const currentAverage = await prisma.record.findUnique({
-      where: {
-        ownerId: data.ownerId,
-      },
-      select: {
-        average: true,
-        totalResets: true,
-      },
-    });
+    type RecordUpdateData = Parameters<typeof prisma.record.update>[0]["data"];
+    const record: RecordUpdateData = {};
 
-    const { average, totalResets } = currentAverage ?? {
-      average: 0,
-      totalResets: 0,
-    };
-    const newAverage =
-      (average * totalResets + data.average * data.resets) / totalResets +
-      data.resets;
+    if (data.clicks) record.totalClicks = { increment: data.clicks };
+    if (data.highscore) record.highscore = data.highscore;
+    if (data.peaks) {
+      const currentAverage = await prisma.record.findUnique({
+        where: {
+          ownerId: data.ownerId,
+        },
+        select: {
+          average: true,
+          averageWeight: true,
+        },
+      });
+      const { average, averageWeight } = currentAverage ?? {
+        average: 0,
+        averageWeight: 0,
+      };
+
+      const w1 = averageWeight;
+      const X1 = average * averageWeight;
+
+      const X2 = data.peaks.reduce((acc, cur) => acc + cur);
+      const w2 = data.peaks.length;
+
+      record.average = (X1 + X2) / (w1 + w2);
+
+      record.totalResets = { increment: data.peaks.length };
+    }
 
     return await prisma.record.update({
       where: {
         ownerId: data.ownerId,
       },
-      data: {
-        highscore: data.highscore,
-        totalClicks: { increment: data.totalClicks },
-        totalResets: { increment: data.resets },
-        average: newAverage,
-        updatedTimes: {
-          increment: 1,
-        },
-      },
+      data: record,
       include: {
         owner: true,
       },
@@ -83,7 +99,7 @@ export async function updateRecord(
         throw new Error(
           `The user with id ${data.ownerId} doesn not have a Record associated with them`,
           {
-            cause: "409",
+            cause: 404,
           },
         );
     } else throw e;
@@ -105,7 +121,6 @@ export async function getRecords(data: GetRecordsInput) {
         totalClicks: true,
         totalResets: true,
         average: true,
-        updatedTimes: true,
         owner: {
           select: {
             name: true,
@@ -144,7 +159,7 @@ export async function getRecordByOwnerId(params: GetRecordByOwnderIdInput) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       if (e.code === "P2025")
         throw new Error(`Record not found for ownerId ${params.ownerId}`, {
-          cause: "404",
+          cause: 404,
         });
     } else throw e;
   }

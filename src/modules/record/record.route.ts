@@ -40,6 +40,7 @@ async function recordRoutes(server: FastifyInstance) {
     "/",
     {
       schema: {
+        // BUG: Show all record schemes names instead of the next scheme
         querystring: $ref("getRecordsQuerySchema"),
         response: {
           200: $ref("recordsResponseSchema"),
@@ -53,6 +54,7 @@ async function recordRoutes(server: FastifyInstance) {
     "/:ownerId",
     {
       schema: {
+        // BUG: Show all record schemes names instead of the next scheme
         params: $ref("getRecordByOwnerIdParamsSchema"),
         response: {
           200: $ref("recordResponseSchema"),

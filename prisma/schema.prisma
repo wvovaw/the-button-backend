@@ -24,7 +24,7 @@ model Record {
   totalResets   Int
   totalClicks   Int
   average       Float
-  updatedTimes  Int      @default(0)
+  averageWeight Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

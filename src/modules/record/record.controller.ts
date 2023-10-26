@@ -72,10 +72,10 @@ export async function getRecordByOwnerIdHandler(
   try {
     const records = await getRecordByOwnerId({ ...request.params });
     return reply.code(200).send(records);
-  } catch (e) {
+  } catch (e: unknown) {
     if (e instanceof Error) {
       if (!isNaN(Number(e.cause))) {
-        return reply.code(Number(e.cause)).send(e.message);
+        return reply.code(Number(e.cause)).send(e);
       } else return reply.code(500).send("Unhandled server error");
     } else throw e;
   }
@@ -85,10 +85,16 @@ export async function getRecordsHandler(
   request: FastifyRequest<{
     Querystring: GetRecordsInput;
   }>,
+  reply: FastifyReply,
 ) {
-  const records = await getRecords({
-    ...request.query,
-  });
-
-  return records;
+  try {
+    const records = await getRecords({ ...request.query });
+    return reply.code(200).send(records);
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      if (!isNaN(Number(e.cause))) {
+        return reply.code(Number(e.cause)).send(e);
+      }
+    }
+  }
 }
