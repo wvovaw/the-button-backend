@@ -8,6 +8,7 @@ import {
 } from "./record.schema";
 import {
   createRecord,
+  deleteRecord,
   getRecordByOwnerId,
   getRecords,
   updateRecord,
@@ -30,7 +31,6 @@ export async function updateRecordHandler(
   request: FastifyRequest<{
     Body: UpdateRecordInput;
   }>,
-  reply: FastifyReply,
 ) {
   const record = await updateRecord({
     ...request.body,
@@ -45,6 +45,14 @@ export async function updateRecordHandler(
     );
   }
   return record;
+}
+
+export async function deleteRecordHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  await deleteRecord(request.user.id);
+  reply.code(204);
 }
 
 export async function getRecordByOwnerIdHandler(

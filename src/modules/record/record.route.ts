@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import {
   createRecordHandler,
+  deleteRecordHandler,
   getRecordByOwnerIdHandler,
   getRecordsHandler,
   updateRecordHandler,
@@ -103,6 +104,43 @@ async function recordRoutes(server: FastifyInstance) {
       },
     },
     updateRecordHandler,
+  );
+
+  server.delete(
+    "/",
+    {
+      preHandler: [server.authenticate],
+      schema: {
+        response: {
+          204: {
+            description: "Successfully deleted user's record",
+            type: "null",
+          },
+          404: {
+            description: "Record not found and can't be deleted",
+            type: "object",
+            properties: {
+              statusCode: { type: "number", default: 404 },
+              error: { type: "string", default: "Not Found" },
+              message: { type: "string" },
+            },
+          },
+          400: {
+            description: "No authorization token provided",
+            type: "object",
+            properties: {
+              statusCode: { type: "number", default: 400 },
+              error: { type: "string", default: "Bad request" },
+              code: { type: "string", default: "FST_JWT_BAD_REQUEST" },
+              message: { type: "string" },
+            },
+          },
+        },
+        description: "Deletes record",
+        tags: ["Record"],
+      },
+    },
+    deleteRecordHandler,
   );
 
   server.get(

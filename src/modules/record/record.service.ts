@@ -107,6 +107,23 @@ export async function updateRecord(
   }
 }
 
+export async function deleteRecord(ownerId: number) {
+  try {
+    await prisma.record.delete({
+      where: {
+        ownerId,
+      },
+    });
+  } catch (e: unknown) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === "P2025")
+        throw new Error(`Record not found.`, {
+          cause: 404,
+        });
+    }
+  }
+}
+
 export async function getRecords(data: GetRecordsInput) {
   const page = data.page ?? 0;
   const perPage = data.perPage ?? 25;
