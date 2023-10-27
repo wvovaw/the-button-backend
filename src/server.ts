@@ -97,7 +97,7 @@ function buildServer() {
   server.register(swaggerUi, {
     prefix: "/docs",
     uiConfig: {
-      docExpansion: "full",
+      docExpansion: "list",
       deepLinking: false,
     },
     uiHooks: {
