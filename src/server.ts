@@ -69,6 +69,11 @@ function buildServer() {
     return next();
   });
 
+  server.setErrorHandler((err, req, reply) => {
+    if (err.cause) reply.code(Number(err.cause)).send(err);
+    else reply.send(err);
+  });
+
   // Register Swagger
   server.register(
     swagger,

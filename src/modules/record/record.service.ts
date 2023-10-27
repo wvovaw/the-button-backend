@@ -150,7 +150,7 @@ export async function getRecordByOwnerId(params: GetRecordByOwnderIdInput) {
   try {
     return await prisma.record.findUniqueOrThrow({
       where: {
-        ownerId: params.ownerId,
+        ownerId: Number(params.ownerId),
       },
       include: {
         owner: true,

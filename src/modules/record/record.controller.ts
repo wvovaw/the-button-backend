@@ -19,19 +19,11 @@ export async function createRecordHandler(
   }>,
   reply: FastifyReply,
 ) {
-  try {
-    const record = await createRecord({
-      ...request.body,
-      ownerId: request.user.id,
-    });
-    return reply.code(201).send(record);
-  } catch (e) {
-    if (e instanceof Error) {
-      if (!isNaN(Number(e.cause)))
-        return reply.code(Number(e.cause)).send(e.message);
-      else return reply.code(500).send("Unhandled server error");
-    } else throw e;
-  }
+  const record = await createRecord({
+    ...request.body,
+    ownerId: request.user.id,
+  });
+  return reply.code(201).send(record);
 }
 
 export async function updateRecordHandler(
@@ -40,27 +32,19 @@ export async function updateRecordHandler(
   }>,
   reply: FastifyReply,
 ) {
-  try {
-    const record = await updateRecord({
-      ...request.body,
-      ownerId: request.user.id,
-    });
-    if (!record) {
-      throw new Error(
-        `The user with id ${request.user.id} doesn not have a Record associated with them`,
-        {
-          cause: "409",
-        },
-      );
-    }
-    return record;
-  } catch (e) {
-    if (e instanceof Error) {
-      if (!isNaN(Number(e.cause)))
-        return reply.code(Number(e.cause)).send(e.message);
-      else return reply.code(500).send("Unhandled server error");
-    } else throw e;
+  const record = await updateRecord({
+    ...request.body,
+    ownerId: request.user.id,
+  });
+  if (!record) {
+    throw new Error(
+      `The user with id ${request.user.id} doesn not have a Record associated with them`,
+      {
+        cause: 409,
+      },
+    );
   }
+  return record;
 }
 
 export async function getRecordByOwnerIdHandler(
@@ -69,16 +53,8 @@ export async function getRecordByOwnerIdHandler(
   }>,
   reply: FastifyReply,
 ) {
-  try {
-    const records = await getRecordByOwnerId({ ...request.params });
-    return reply.code(200).send(records);
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      if (!isNaN(Number(e.cause))) {
-        return reply.code(Number(e.cause)).send(e);
-      } else return reply.code(500).send("Unhandled server error");
-    } else throw e;
-  }
+  const records = await getRecordByOwnerId({ ...request.params });
+  return reply.code(200).send(records);
 }
 
 export async function getRecordsHandler(
@@ -87,14 +63,6 @@ export async function getRecordsHandler(
   }>,
   reply: FastifyReply,
 ) {
-  try {
-    const records = await getRecords({ ...request.query });
-    return reply.code(200).send(records);
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      if (!isNaN(Number(e.cause))) {
-        return reply.code(Number(e.cause)).send(e);
-      }
-    }
-  }
+  const records = await getRecords({ ...request.query });
+  return reply.code(200).send(records);
 }

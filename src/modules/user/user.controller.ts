@@ -10,14 +10,8 @@ export async function registerUserHandler(
   reply: FastifyReply,
 ) {
   const body = request.body;
-
-  try {
-    const user = await createUser(body);
-    return reply.code(201).send(user);
-  } catch (e: unknown) {
-    console.log(e);
-    if (e instanceof Error) return reply.code(Number(e.cause)).send(e);
-  }
+  const user = await createUser(body);
+  return reply.code(201).send(user);
 }
 
 export async function loginHandler(
@@ -61,6 +55,5 @@ export async function loginHandler(
 
 export async function getUsersHandler() {
   const users = await findUsers();
-
   return users;
 }
