@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn
 COPY . .
-EXPOSE 5000
+EXPOSE 7000
 RUN yarn build
 RUN yarn db:gen
 CMD ["yarn", "start"]
