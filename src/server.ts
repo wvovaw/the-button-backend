@@ -6,6 +6,7 @@ import swaggerUi from "@fastify/swagger-ui";
 import { withRefResolver } from "fastify-zod";
 import userRoutes from "./modules/user/user.route";
 import recordRoutes from "./modules/record/record.route";
+import healthcheckRoute from "./routes/healthcheck";
 import { userSchemas } from "./modules/user/user.schema";
 import { recordSchemas } from "./modules/record/record.schema";
 import { version } from "../package.json";
@@ -129,6 +130,7 @@ function buildServer() {
 
   server.register(userRoutes, { prefix: "api/users" });
   server.register(recordRoutes, { prefix: "api/records" });
+  server.register(healthcheckRoute, { prefix: "api" });
 
   return server;
 }
