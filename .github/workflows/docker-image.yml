@@ -2,14 +2,12 @@ name: Docker build and push
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -37,3 +35,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Trigger Render deploy hook
+        run: |
+          curl ${{ secrets.RENDER_DEPLOY_HOOK }}
