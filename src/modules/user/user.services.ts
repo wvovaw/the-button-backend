@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { hashPassword } from "../../utils/hash";
 import prisma from "../../utils/prisma";
-import { CreateUserInput } from "./user.schema";
+import { CreateUserInput } from "./user.schemas";
 
 export async function createUser(input: CreateUserInput) {
   const { password, ...rest } = input;

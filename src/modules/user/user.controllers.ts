@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { verifyPassword } from "../../utils/hash";
-import { CreateUserInput, LoginInput } from "./user.schema";
-import { createUser, findUserByEmail, findUsers } from "./user.service";
+import { CreateUserInput, LoginInput } from "./user.schemas";
+import { createUser, findUserByEmail, findUsers } from "./user.services";
 
 export async function registerUserHandler(
   request: FastifyRequest<{

@@ -5,14 +5,14 @@ import {
   GetRecordByOwnderIdInput,
   GetRecordsInput,
   UpdateRecordInput,
-} from "./record.schema";
+} from "./record.schemas";
 import {
   createRecord,
   deleteRecord,
   getRecordByOwnerId,
   getRecords,
   updateRecord,
-} from "./record.service";
+} from "./record.services";
 
 export async function createRecordHandler(
   request: FastifyRequest<{

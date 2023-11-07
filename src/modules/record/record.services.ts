@@ -6,7 +6,7 @@ import {
   GetRecordByOwnderIdInput,
   GetRecordsInput,
   UpdateRecordInput,
-} from "./record.schema";
+} from "./record.schemas";
 
 export async function createRecord(
   data: CreateRecordInput & { ownerId: number },

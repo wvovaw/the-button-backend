@@ -3,8 +3,8 @@ import {
   loginHandler,
   registerUserHandler,
   getUsersHandler,
-} from "./user.controller";
-import { $ref } from "./user.schema";
+} from "./user.controllers";
+import { $ref } from "./user.schemas";
 
 async function userRoutes(server: FastifyInstance) {
   server.post(

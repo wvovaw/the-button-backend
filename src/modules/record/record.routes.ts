@@ -5,8 +5,8 @@ import {
   getRecordByOwnerIdHandler,
   getRecordsHandler,
   updateRecordHandler,
-} from "./record.controller";
-import { $ref } from "./record.schema";
+} from "./record.controllers";
+import { $ref } from "./record.schemas";
 
 async function recordRoutes(server: FastifyInstance) {
   server.post(
