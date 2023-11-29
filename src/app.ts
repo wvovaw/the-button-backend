@@ -2,10 +2,10 @@ import buildServer from "./server";
 
 async function main() {
   try {
-    const server = buildServer();
+    const server = await buildServer();
     void server.listen({
-      port: Number(process.env.PORT ?? 3000),
-      host: process.env.SERVER_HOSTNAME ?? "0.0.0.0",
+      port: server.config.PORT,
+      host: server.config.SERVER_HOSTNAME,
     });
 
     server.ready((err: Error) => {
@@ -14,7 +14,7 @@ async function main() {
         process.exit(1);
       }
       server.log.info(
-        `Server listening on port ${Number(process.env.PORT ?? 3000)}`,
+        `Server listening on port ${server.config.SERVER_HOSTNAME}:${server.config.PORT}`,
       );
     });
   } catch (e) {

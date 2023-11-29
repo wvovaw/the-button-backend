@@ -1,16 +1,14 @@
 import Fastify from "fastify";
 import { PinoLoggerOptions } from "fastify/types/logger";
-import * as dotenv from "dotenv";
 import setupSwagger from "./setupSwagger";
 import setupCloseWithGrace from "./setupCloseWithGrace";
 import setupRoutes from "./setupRoutes";
 import setupJWT from "./setupJWT";
 import setupCors from "./setupCors";
 import setupErrorHandler from "./setupErrorHandler";
+import setupEnv from "./setupEnv";
 
-dotenv.config();
-
-function buildServer() {
+async function buildServer() {
   const loggerConfig: Record<string, PinoLoggerOptions | boolean> = {
     development: {
       transport: {
@@ -24,13 +22,14 @@ function buildServer() {
     production: true,
     test: false,
   };
+
   const nodeEnv = process.env.NODE_ENV ?? "development";
 
   const server = Fastify({
     logger: loggerConfig[nodeEnv] ?? true,
   });
-  server.log.info("Server build in %s mode", nodeEnv);
 
+  await setupEnv(server);
   setupErrorHandler(server);
   setupCors(server);
   setupJWT(server);

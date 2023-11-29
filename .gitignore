@@ -66,6 +66,9 @@ dist
 
 # .env file
 .env
+.env.development
+.env.production
+.env.test
 .envrc
 
 # Eslint cache

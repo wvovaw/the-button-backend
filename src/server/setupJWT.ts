@@ -22,7 +22,7 @@ declare module "@fastify/jwt" {
 
 export default function (server: FastifyInstance) {
   server.register(fjwt, {
-    secret: process.env.APP_JWT_SECRET ?? "changemetosecret",
+    secret: server.config.JWT_SECRET,
     verify: {
       extractToken: (request) =>
         request.headers.authorization?.split(" ").at(1),
