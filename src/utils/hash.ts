@@ -42,3 +42,19 @@ export function verifyPassword({
 
   return candidateHash === hash;
 }
+
+export function verifySignature({
+  data,
+  signature: candidateSignature,
+  secret,
+}: {
+  data: string;
+  signature: string;
+  secret: string;
+}) {
+  const hmac = crypto.createHmac("sha256", secret);
+  hmac.update(data);
+  const signature = hmac.digest("hex");
+
+  return candidateSignature === signature;
+}

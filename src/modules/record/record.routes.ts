@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import {
   createRecordHandler,
   deleteRecordHandler,
@@ -7,13 +7,44 @@ import {
   updateRecordHandler,
 } from "./record.controllers";
 import { $ref } from "./record.schemas";
+import { verifySignature } from "../../utils/hash";
 
 async function recordRoutes(server: FastifyInstance) {
+  async function validSignature(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const data = JSON.stringify(request.body);
+      const secret = request.server.config.SIGNATURE_SECRET;
+      const signature = request.headers["x-signature"];
+
+      request.log.info(`Secret: ${secret}, signature: ${signature}`);
+
+      if (typeof signature === "string") {
+        if (
+          !verifySignature({
+            data,
+            signature,
+            secret,
+          })
+        )
+          throw new Error("Your signature sucks");
+      } else throw new Error("Signature not provided");
+    } catch (e) {
+      if (e instanceof Error) return reply.code(409).send(e.message);
+      else return reply.code(400).send("You lie");
+    }
+  }
+
   server.post(
     "/",
     {
-      preHandler: [server.authenticate],
+      preHandler: [server.authenticate, validSignature],
       schema: {
+        headers: {
+          "X-Signature": {
+            type: "string",
+            description: "Body data signed by secret key",
+          },
+        },
         body: {
           ...$ref("createtRecordBodySchema"),
           description: `All properties is optional, but at least one shall be provided.
@@ -61,8 +92,14 @@ async function recordRoutes(server: FastifyInstance) {
   server.put(
     "/",
     {
-      preHandler: [server.authenticate],
+      preHandler: [server.authenticate, validSignature],
       schema: {
+        headers: {
+          "X-Signature": {
+            type: "string",
+            description: "Body data signed by secret key",
+          },
+        },
         body: {
           ...$ref("updateRecordBodySchema"),
           description: `All properties is optional, but at least one shall be provided.

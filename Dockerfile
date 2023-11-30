@@ -6,5 +6,5 @@ RUN yarn
 COPY . .
 EXPOSE 7000
 RUN yarn build
-RUN yarn db:gen
+RUN yarn prisma:prod generate
 CMD ["yarn", "start"]

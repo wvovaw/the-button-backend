@@ -13,9 +13,6 @@ async function main() {
         server.log.error(err);
         process.exit(1);
       }
-      server.log.info(
-        `Server listening on port ${server.config.SERVER_HOSTNAME}:${server.config.PORT}`,
-      );
     });
   } catch (e) {
     console.error(e);

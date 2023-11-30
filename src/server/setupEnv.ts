@@ -5,7 +5,12 @@ import { FromSchema } from "json-schema-to-ts";
 
 const schema = {
   type: "object",
-  required: ["JWT_SECRET", "DATABASE_URL", "CORS_ALLOWED_ORIGINS"],
+  required: [
+    "JWT_SECRET",
+    "SIGNATURE_SECRET",
+    "DATABASE_URL",
+    "CORS_ALLOWED_ORIGINS",
+  ],
   properties: {
     NODE_ENV: {
       type: "string",
@@ -20,6 +25,9 @@ const schema = {
       default: "0.0.0.0",
     },
     JWT_SECRET: {
+      type: "string",
+    },
+    SIGNATURE_SECRET: {
       type: "string",
     },
     DATABASE_URL: {
